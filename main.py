@@ -1,66 +1,80 @@
-# Функция для отображения главного меню
-def show_main_menu():
-    print("Выберите действие:")
-    print("1. Режим приветствия")
-    print("2. Режим разговора")
-    print("3. Режим прощания")
-    print("4. Выйти")
+from enum import Enum
 
 
-# Функция для обработки выбранного действия в главном меню
-def process_main_menu_choice(choice):
-    if choice == "1":
-        greet_mode()
-    elif choice == "2":
-        talk_mode()
-    elif choice == "3":
-        bye_mode()
-    elif choice == "4":
-        exit_mode()
-    else:
-        print("Неверный выбор. Пожалуйста, выберите число от 1 до 4.")
+# Список возможных состояний бота
+class BotState(Enum):
+    GREET = 1
+    RECOMMEND_GENRE = 2
+    RECOMMEND_MOVIE = 3
+    THANK = 4
+    BYE = 5
 
 
-# Функция для режима приветствия
-def greet_mode():
-    print("Привет! Как я могу тебе помочь?")
-    while True:
-        # Читаем сообщение пользователя
-        message = input("Ваше сообщение: ")
-        # Если пользователь говорит "пока", переходим в режим прощания
-        if message.lower() == "пока":
-            bye_mode()
-            break
+# Класс, представляющий чатбота
+class MovieBot:
+    def __init__(self):
+        self.current_state = BotState.GREET
+
+    # Метод для обработки входящего сообщения
+    def process_message(self, message):
+        if self.current_state == BotState.GREET:
+            if message.lower() == "привет":
+                print("Привет! Я могу порекомендовать тебе фильм на новогоднюю или рождественскую тематику.")
+                print("Какой фильм вы смотрели последним?")
+                self.current_state = BotState.RECOMMEND_GENRE
+            else:
+                print("Прости, я не понимаю. Попробуй сказать 'привет'")
+
+        elif self.current_state == BotState.RECOMMEND_GENRE:
+            print("Отлично!")
+            print("Могу порекомендовать тебе фильмы следующих жанров:")
+            print("- Комедия")
+            print("- Мультфильм")
+            print("- Романтика")
+            print("- Фэнтези")
+            print("Какой жанр тебя интересует?")
+            self.current_state = BotState.RECOMMEND_MOVIE
+
+        elif self.current_state == BotState.RECOMMEND_MOVIE:
+            genre = message.lower()
+            print("Понятно, ты ищешь фильм в жанре", genre)
+            print("Вот несколько рекомендаций:")
+            if genre == "комедия":
+                print("- Один дома")
+                print("- Гринч — похититель Рождества")
+            elif genre == "мультфильм":
+                print("- Рождественская история")
+                print("- Головоломка")
+            elif genre == "романтика":
+                print("- Любовь на Рождество")
+                print("- Рождественская песня")
+            elif genre == "фэнтези":
+                print("- Как гринч украл Рождество")
+                print("- Однажды в Рождественской сказке")
+            else:
+                print("Извини, я не знаю фильмов в жанре", genre)
+                print("Может, выберешь что-то другое?")
+                return
+            print("Наслаждайся просмотром!")
+            self.current_state = BotState.THANK
+
+        elif self.current_state == BotState.THANK:
+            print("Понравился ли тебе выбранный фильм?")
+            self.current_state = BotState.BYE
+
+        elif self.current_state == BotState.BYE:
+            if message.lower() == "да":
+                print("Отлично! Рад, что смог помочь.")
+            else:
+                print("Жаль, что фильм не понравился. Может, попробуем что-то другое?")
+            print("Спасибо за общение! Удачного просмотра!")
+            self.current_state = BotState.GREET
 
 
-# Функция для режима разговора
-def talk_mode():
-    print("В какую тему тебя интересует общение?")
-    while True:
-        # Читаем сообщение пользователя
-        topic = input("Тема: ")
-        # Если пользователь говорит "пока", переходим в режим прощания
-        if topic.lower() == "пока":
-            bye_mode()
-            break
-        else:
-            print(f"Разговор на тему {topic}...")
-            # Здесь можно добавить логику для разговора на конкретную тему
-
-
-# Функция для режима прощания
-def bye_mode():
-    print("Пока! Буду ждать тебя снова.")
-
-
-# Функция для режима выхода из программы
-def exit_mode():
-    print("До встречи!")
-    exit()
-
+# Создаем экземпляр чатбота
+movie_bot = MovieBot()
 
 # Основной цикл программы
 while True:
-    show_main_menu()
-    choice = input("Ваш выбор: ")
-    process_main_menu_choice(choice)
+    message = input("Ваше сообщение: ")
+    movie_bot.process_message(message)
